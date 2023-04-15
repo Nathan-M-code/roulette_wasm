@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Roulette</title>
+    <!-- Ajout des liens CSS et JS de Bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    
+    <script type="module">
+        import init, { compute_triggers } from "/pkg/roulette_wasm.js";
+        init();
+
+        function inputNb() {
+            var input = parseInt(document.getElementById("number-input").value);
+            var min_succession = parseInt(document.getElementById("min-succession-input").value);
+            
+            //add in list
+            var number_list = document.getElementById("number-list");
+            var item = document.createElement("li");
+            item.className = "list-group-item";
+            item.appendChild(document.createTextNode(input));
+            number_list.insertBefore(item, number_list.firstChild);
+
+            // Get all li elements in the ul
+            const listItems = document.querySelectorAll("#number-list li");
+            const inputs = Array.from(listItems).map(li => parseInt(li.textContent));
+            
+            const triggers = compute_triggers(min_succession, inputs);
+
+            var trigger_list = document.getElementById("trigger-list");
+            trigger_list.innerHTML = ""; // supprime tous les éléments de la liste
+            triggers.forEach(trigger => {
+                var item = document.createElement("li");
+                item.className = "list-group-item";
+                item.appendChild(document.createTextNode(trigger));
+                trigger_list.appendChild(item);
+            });
+
+        }
+
+        document.getElementById("number-input-btn").addEventListener("click", inputNb);
+    </script>
+</head>
+
+<body class="text-center">
+    <div class="container">
+        <h1 class="mx-auto">Roulette</h1>
+        <div class="row">
+            <div class="col-sm-6 mx-auto">
+                <label for="min-succession-input">Entrez une succession minimum :</label>
+                <input type="number" id="min-succession-input" class="form-control">
+                <label for="number-input">Entrez un nombre :</label>
+                <input type="number" id="number-input" class="form-control">
+                <button id="number-input-btn" class="btn btn-primary mt-3">Ajouter</button>
+            </div>
+        </div>
+        <div class="row mt-5">
+            <div class="col-sm-6 mx-auto">
+                <h2>Triggers :</h2>
+                <ul id="trigger-list" class="list-group"></ul>
+            </div>
+        </div>
+        <div class="row mt-5">
+            <div class="col-sm-6 mx-auto">
+                <h2>Nombres tombés:</h2>
+                <ul id="number-list" class="list-group"></ul>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
